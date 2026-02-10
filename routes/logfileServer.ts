@@ -11,7 +11,15 @@ export function serveLogFiles () {
     const file = params.file
 
     if (!file.includes('/')) {
-      res.sendFile(path.resolve('logs/', file))
+      const baseDir = path.resolve('ftp')
+const requestedPath = path.resolve(baseDir, file)
+
+// Block traversal: requested file must stay inside ftp folder
+if (!requestedPath.startsWith(baseDir + path.sep)) {
+  return res.status(400).json({ error: 'Invalid file path' })
+}
+
+return res.sendFile(requestedPath)
     } else {
       res.status(403)
       next(new Error('File names cannot contain forward slashes!'))
