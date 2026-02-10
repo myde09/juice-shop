@@ -21,8 +21,22 @@ if (!toUrl.startsWith('/')) {
       challengeUtils.solveIf(challenges.redirectCryptoCurrencyChallenge, () => { return toUrl === 'https://explorer.dash.org/address/Xr556RzuwX6hg5EGpkybbv5RanJoZN17kW' || toUrl === 'https://blockchain.info/address/1AbKfgvw9psQ41NbLi8kufDQTezwG8DRZm' || toUrl === 'https://etherscan.io/address/0x0f933ab9fcaaa782d0279c300d73750e1311eae6' })
       challengeUtils.solveIf(challenges.redirectChallenge, () => { return isUnintendedRedirect(toUrl) })
      
+     // Allow-list of internal pages we permit redirects to
+const allowedRedirects = new Set([
+  '/',
+  '/search',
+  '/login',
+  '/profile',
+  '/basket',
+  '/privacy',
+  '/about'
+])
+const basePath = toUrl.split('?')[0]
+      if (!allowedRedirects.has(basePath)) {
+  return res.status(400).json({ error: 'Invalid redirect target' })
+}
       res.redirect(toUrl)
-    } else {
+     else {
       res.status(406)
       next(new Error('Unrecognized target URL for redirect: ' + toUrl))
     }
