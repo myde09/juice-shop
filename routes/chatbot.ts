@@ -3,6 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
+const escapeHtml = (input: string) =>
+  input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+
 import fs from 'node:fs/promises'
 import { type Request, type Response, type NextFunction } from 'express'
 import { type User } from '../data/types'
@@ -83,7 +91,9 @@ async function processQuery (user: User, req: Request, res: Response, next: Next
       return
     }
   }
-
+const safeQuery = escapeHtml(req.body.query || "")
+req.body.query = safeQuery
+  
   if (!req.body.query) {
     res.status(200).json({
       action: 'response',
